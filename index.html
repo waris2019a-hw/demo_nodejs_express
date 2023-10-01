@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Input Form</title>
+</head>
+<body>
+    <h1>User Input Form</h1>
+
+    <form id="userForm">
+        <label for="id">ID:</label>
+        <input type="text" id="id" name="id" required>
+        <br>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <br>
+        <label for="depart">Department:</label>
+        <input type="text" id="depart" name="depart" required>
+        <br>
+        <input type="submit" value="Submit">
+    </form>
+
+    <script>
+        document.getElementById("userForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+            const userData = {};
+
+            formData.forEach((value, key) => {
+                userData[key] = value;
+            });
+
+            // Send the user data to the server for processing
+            fetch("/saveUserData", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(userData),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    alert("User data saved successfully!");
+                })
+                .catch((error) => {
+                    console.error("Error saving user data:", error);
+                });
+        });
+    </script>
+
+   <h1>User Data</h1>
+
+    <ul id="userDataList"></ul>
+
+    <script>
+        // Fetch user data from the server
+        fetch('/getUserData')
+            .then(response => response.json())
+            .then(data => {
+                const userDataList = document.getElementById('userDataList');
+                data.forEach(user => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `ID: ${user.id}, Name: ${user.name}, Department: ${user.depart}`;
+                    userDataList.appendChild(listItem);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching user data:', error);
+            });
+    </script>
+  
+</body>
+</html>
